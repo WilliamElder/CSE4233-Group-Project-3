@@ -1,14 +1,9 @@
-from sqlalchemy import create_engine, Table, Column, Date, Float, Integer, String, MetaData, ForeignKeyConstraint, ForeignKey
+from sqlalchemy import create_engine, select, Table, Column, Date, Float, Integer, String, MetaData, ForeignKeyConstraint, ForeignKey
 from enum import Enum
-
-class SQL(Enum):
-  SETUP_DATA = "sql/setup_data.sql"
-
-  def __str__(self):
-    return str(self.value)
 
 class DB:
 
+  # Upon __init__ of DB class, sqlite3 SQL tables are created and populated in memory (RAM)
   def __init__(self):
     self.engine = create_engine('sqlite:///:memory:')
     self.conn = self.engine.connect()
@@ -94,16 +89,92 @@ class DB:
     item = Column('item', Integer, ForeignKey('store_item.id'))
     self.shopping_cart_item.append_column(item)
 
-  # Doesn't work currently
+    self.metadata.create_all(self.engine)
+
+    self.setup_data()
+
   def setup_data(self):
     ins = self.address.insert().values(
-      address_line1='test',
-      city='test',
-      country='test',
-      zip=1234
+      address_line1='62 Headline Way',
+      address_line2='Apt. 9',
+      city='Starkville',
+      country='USA',
+      zip=39759
     )
-    print(ins.compile().params)
     self.engine.execute(ins)
 
+    ins = self.user.insert().values(
+      username='justin',
+      password='testing123',
+      shipping_address=1
+    )
+    self.engine.execute(ins)
+
+  """ Generic method for performing 'SELECT * from a table'.
+  :param self.table: DB.'table_name' for selecting from
+
+  :return result <List> 
+  """
+  def select_all(self, table):
+    sel = select([table])
+    result = []
+    for row in self.conn.execute(sel):
+      result.append(row)
+    return result
+
+  def select_column(self, table_column):
+    sel = select([table_column])
+    result = []
+    for row in self.conn.execute(sel):
+      result.append(row)
+    return result
+
+  """ Select all records from 'user' table.
+  :return result <List>
+  """
+  def select_users(self):
+    return self.select_all(self.user)
+  
+  """ Select all records from 'orders' table.
+  :return result <List>
+  """
+  def select_orders(self):
+    return self.select_all(self.orders)
+
+  """ Select all records from 'payment' table.
+  :return result <List>
+  """
+  def select_payments(self):
+    return self.select_all(self.payment)
+
+  """ Select all records from 'address' table.
+  :return result <List>
+  """
+  def select_addresses(self):
+    return self.select_all(self.address)
+
+  """ Select all records from 'shopping_cart' table.
+  :return result <List>
+  """
+  def select_shopping_carts(self):
+    return self.select_all(self.shopping_cart)
+
+  """ Select all records from 'shopping_cart_item' table.
+  :return result <List>
+  """
+  def select_shopping_cart_items(self):
+    return self.select_all(self.shopping_cart_item)
+  
+  """ Select all records from 'store_item' table.
+  :return result <List>
+  """
+  def select_store_items(self):
+    return self.select_all(self.store_item)
+
+  def select_address_by(self, column):
+    for col in self.address.columns:
+      if str(col) == 'address.' + column:
+        return self.select_column(col)
+
   def __del__(self):
-    pass
+    self.conn.close()
