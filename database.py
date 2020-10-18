@@ -1,10 +1,9 @@
-from sqlalchemy import create_engine, select, Table, Column, Date, Float, Integer, String, MetaData, ForeignKeyConstraint, ForeignKey
+from sqlalchemy import create_engine, select, insert, update, delete, Table, Column, Date, Float, Integer, String, MetaData, ForeignKeyConstraint, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from enum import Enum
 
 Base = declarative_base()
-engine = create_engine('sqlite:///:memory:')
 
 class User(Base):
   __tablename__ = 'users'
@@ -32,9 +31,9 @@ class Address(Base):
   address_line1 = Column(String, nullable=False)
   address_line2 = Column(String)
   city = Column(String, nullable=False)
-  state = Column(String, nullable=False)
+  state = Column(String)
   country = Column(String, nullable=False)
-  zip = Column(String, nullable=False)
+  zip = Column(String)
   order_id = Column(Integer, ForeignKey("orders.id"))
   payment_id = Column(Integer, ForeignKey("payment.id"))
   
@@ -93,5 +92,29 @@ class OrderStoreItemLink(Base):
   store_item_id = Column(Integer, ForeignKey("store_item.id"), primary_key=True)
 
 
-Base.metadata.create_all(engine)
-print(engine.connect())
+class Database:
+  engine = create_engine('sqlite:///:memory:')
+  connection = engine.connect()
+
+  def __init__(self):
+    Base.metadata.create_all(self.engine)
+
+    # insert test data
+    ins = insert(Address).values(
+      address_line1 = '62 Headline Road',
+      address_line2 = 'Apartment 2',
+      city = 'Starkville',
+      state = 'MS',
+      country = 'USA',
+      zip = 39759
+    )
+    self.connection.execute(ins)
+
+    ins = insert(Address).values(
+      address_line1 = '322 Annapurna Road',
+      address_line2 = 'Ward Number 9',
+      city = 'Pokhara, Kaski District',
+      country = 'Nepal'
+    )
+    self.connection.execute(ins)
+    

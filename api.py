@@ -1,3 +1,6 @@
+from database import Database
+db = Database()
+
 class Api:
     """ Attempts to log in to the client.
     :param uname: User name
