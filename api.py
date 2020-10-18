@@ -24,15 +24,16 @@ class Api:
     :return A list of items
     """
     def get_items_by_category(self, uid: int, category) -> list:
-        if uid == 345:
-            if category is None:
-                return [5, 6, 7, 8]
-            elif category is not "":
-                return [5, 6]
-            else:
-                raise self.CategoryError
-        else:
-            raise self.UserIdError
+      pass
+        # if uid == 345:
+        #     if category is None:
+        #         return [5, 6, 7, 8]
+        #     elif category is not "":
+        #         return [5, 6]
+        #     else:
+        #         raise self.CategoryError
+        # else:
+        #     raise self.UserIdError
 
     """ Gets items from the database by a specific category
     :param uid: User id
@@ -46,16 +47,14 @@ class Api:
     :return if successful
     """
     def add_item_to_cart(self, uid: int, iid:int, count=1):
-        if int(count) != count:
-            raise ValueError("Count must be an integer")
-        if uid == 345:
-            if iid not in [5, 6, 7, 8]:
-                raise self.ItemIdError
-            elif count > int(iid/2): # emulate stock
-
-
-        else:
-            raise self.UserIdError
+        # if int(count) != count:
+        #     raise ValueError("Count must be an integer")
+        # if uid == 345:
+        #     if iid not in [5, 6, 7, 8]:
+        #         raise self.ItemIdError
+        #     elif count > int(iid/2): # emulate stock
+        # else:
+        #     raise self.UserIdError
         pass
 
     """ Gets items from user's cart by their id
