@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, select, insert, update, delete, Table, Column, Date, Float, Integer, String, MetaData, ForeignKeyConstraint, ForeignKey
+from sqlalchemy import create_engine, select, insert, text, update, delete, Table, Column, Date, Float, Integer, String, MetaData, ForeignKeyConstraint, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import date
@@ -141,11 +141,33 @@ class Database:
     )
     justin_shopping_cart_id = self.connection.execute(ins).inserted_primary_key[0]
 
-    sel = select([User])
-    for row in self.connection.execute(sel):
-      print(row)
+    # sel = select([User])
+    # for row in self.connection.execute(sel):
+    #   print(row)
     
-    sel = select([ShoppingCart])
-    for row in self.connection.execute(sel):
-      print(row)
+    # sel = select([ShoppingCart])
+    # for row in self.connection.execute(sel):
+    #   print(row)
+
+  """ Tries to auth user by username and password
+  :param username:
+  :param password:
+
+  :return User.id of user
+  """
+  def auth_user(self, username: str, password: str):
+    if len(username) > 0 and len(password) > 0:
+      statement = text("SELECT * FROM users WHERE users.username = '{}' AND users.password = '{}'".format(username, password))
+      result = self.connection.execute(statement)
+      return result.lastrowid
+    else:
+      return -1
+
+  def get_user_cart(self, uid: int) -> int:
+    if uid > 0:
+      statement = text("SELECT * FROM shopping_cart WHERE shopping_cart.user_id = '{}'".format(uid))
+      return self.connection.execute(statement).fetchone().id
+    else:
+      return -1
+
     

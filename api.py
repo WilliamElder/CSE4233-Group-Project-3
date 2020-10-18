@@ -11,8 +11,9 @@ class Api:
     """
     def login(self, uname: str, pw: str) -> int:
         # Placeholder
-        if 2 == int("2"):
-            return 345
+        uid = db.auth_user(uname, pw)
+        if uid:
+          return uid
         else:
             raise self.LoginError
 
@@ -47,15 +48,7 @@ class Api:
     :return if successful
     """
     def add_item_to_cart(self, uid: int, iid:int, count=1):
-        # if int(count) != count:
-        #     raise ValueError("Count must be an integer")
-        # if uid == 345:
-        #     if iid not in [5, 6, 7, 8]:
-        #         raise self.ItemIdError
-        #     elif count > int(iid/2): # emulate stock
-        # else:
-        #     raise self.UserIdError
-        pass
+        return db.get_user_cart(1)
 
     """ Gets items from user's cart by their id
     :param uid: User id
@@ -81,3 +74,8 @@ class Api:
 
     class LoginError(Exception):
         pass
+
+api = Api()
+
+api.login('justin', 'password1234')
+print(api.add_item_to_cart(1, 1, 1))
