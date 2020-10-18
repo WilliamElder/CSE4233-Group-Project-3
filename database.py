@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, select, insert, update, delete, Table, Column, Date, Float, Integer, String, MetaData, ForeignKeyConstraint, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from enum import Enum
+from datetime import date
 
 Base = declarative_base()
 
@@ -18,6 +18,7 @@ class Order(Base):
   __tablename__ = 'orders'
 
   id = Column(Integer, primary_key=True)
+  status = Column(String, nullable=False)
   user_id = Column(Integer, ForeignKey("users.id"))
   user = relationship("User", back_populates="orders")
   payment = relationship("Payment", uselist=False, backref="orders")
@@ -73,7 +74,7 @@ class ShoppingCart(Base):
   __tablename__ = 'shopping_cart'
 
   id = Column(Integer, primary_key=True, nullable=False)
-  date_added = Column(Date, nullable=False)
+  date_created = Column(Date, nullable=False)
   items = relationship("ShoppingCartItem", uselist=False, back_populates="shopping_cart")
   user_id = Column(Integer, ForeignKey("users.id"))
   user = relationship("User", back_populates="shopping_cart")
@@ -100,6 +101,8 @@ class Database:
     Base.metadata.create_all(self.engine)
 
     # insert test data
+
+    # Address data
     ins = insert(Address).values(
       address_line1 = '62 Headline Road',
       address_line2 = 'Apartment 2',
@@ -108,7 +111,7 @@ class Database:
       country = 'USA',
       zip = 39759
     )
-    self.connection.execute(ins)
+    addr1_id = self.connection.execute(ins).inserted_primary_key[0]
 
     ins = insert(Address).values(
       address_line1 = '322 Annapurna Road',
@@ -116,5 +119,33 @@ class Database:
       city = 'Pokhara, Kaski District',
       country = 'Nepal'
     )
-    self.connection.execute(ins)
+    addr2_id = self.connection.execute(ins).inserted_primary_key[0]
+
+    # User data
+    ins = insert(User).values(
+      username = 'justin',
+      password = 'password1234'
+    )
+    justin_id = self.connection.execute(ins).inserted_primary_key[0]
+
+    ins = insert(User).values(
+      username='tanmay',
+      password='professor'
+    )
+    tanmay_id = self.connection.execute(ins).inserted_primary_key[0]
+
+    # ShoppingCart data
+    ins = insert(ShoppingCart).values(
+      date_created = date.today(),
+      user_id = justin_id
+    )
+    justin_shopping_cart_id = self.connection.execute(ins).inserted_primary_key[0]
+
+    sel = select([User])
+    for row in self.connection.execute(sel):
+      print(row)
+    
+    sel = select([ShoppingCart])
+    for row in self.connection.execute(sel):
+      print(row)
     
