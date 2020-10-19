@@ -226,4 +226,16 @@ class Database:
           )
           self.connection.execute(ins)
           return 1
-    
+  
+  def remove_item_from_cart(self, uid, iid):
+    if uid > 0 and iid > 0:
+      statement = text("SELECT * FROM users WHERE users.id = '{}'".format(uid))
+      res = self.connection.execute(statement).fetchone()
+      if res:
+        statement = text("SELECT * FROM store_item WHERE store_item.id = '{}'".format(iid))
+        res = self.connection.execute(statement).fetchone()
+        if res:
+          cart_id = self.get_user_cart(uid).id
+          statement = text("DELETE FROM shopping_cart_item WHERE item_id = '{}'".format(iid))
+          self.connection.execute(statement)
+          return 1

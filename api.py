@@ -47,8 +47,13 @@ class Api:
     
     :return if successful
     """
-    def add_item_to_cart(self, uid: int, iid:int, count=1):
+    def add_item_to_cart(self, uid: int, iid: int, count=1):
       db.add_item_to_cart(uid, iid, count)
+
+    """
+    """
+    def delete_item_from_cart(self, uid: int, iid: int):
+      db.remove_item_from_cart(uid, iid)
 
     """ Gets items from user's cart by their id
     :param uid: User id
@@ -97,4 +102,8 @@ api.get_item_info(1)
 api.add_item_to_cart(1, 1, 1)
 api.add_item_to_cart(1, 2, 3)
 api.get_cart_by_id(1)
+api.print_cart(1)
+api.delete_item_from_cart(1, 1)
+api.get_cart_by_id(1)
+print("AFTER")
 api.print_cart(1)
