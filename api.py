@@ -21,7 +21,7 @@ class Api:
     :raises CategoryIDError: Category does not exist
     :return A list of items
     """
-    def get_items_by_category(self, uid: int, category) -> list:
+    def get_iids_by_category(self, uid: int, category) -> list:
         if uid == 345:
             if category is None:
                 return [5, 6, 7, 8]
@@ -43,7 +43,7 @@ class Api:
     
     :return if successful
     """
-    def add_item_to_cart(self, uid: int, iid: int, count=1):
+    def add_iid_to_cart(self, uid: int, iid: int, count=1):
         print(f"Adding {count} items of id {iid}")
         if int(count) != count:
             raise ValueError("Count must be an integer")
@@ -60,14 +60,13 @@ class Api:
     :param uid: User id
     
     """
-    def get_cart_by_id(self, uid: int):
+    def get_cart_by_uid(self, uid: int):
         return [(5, 2), (6,1)]
 
-    def remove_item_from_cart(self, uid: int, iid: int, count=None):
+    def remove_iid_from_cart(self, uid: int, iid: int, count=None):
         pass
 
-
-    def get_item_info(self, iid: int):
+    def get_item_by_iid(self, iid: int):
         pass
 
     def edit_address(self, uid, name, line1, line2, city, state, zipcode):

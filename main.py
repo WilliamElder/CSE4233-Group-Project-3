@@ -23,7 +23,7 @@ class CLI:
 
     def remove_item_from_cart(self, iid:int, count=None):
         try:
-            return self.api.remove_item_from_cart(self.uid, iid, count)
+            return self.api.remove_iid_from_cart(self.uid, iid, count)
         except self.api.UserIdError:
             print("Invalid user ID!")
             return False
@@ -33,10 +33,10 @@ class CLI:
 
     def print_cart(self) -> None:
         try:
-            items = self.api.get_cart_by_id(self.uid)
+            items = self.api.get_cart_by_uid(self.uid)
             items = items if items is not None else ["a"]
             for iid in items:
-                print(self.api.get_item_info(iid))
+                print(self.api.get_item_by_iid(iid))
         except self.api.UserIdError:
             print("Invalid user ID!")
             return
@@ -75,15 +75,15 @@ class CLI:
         print(self.api.get_address_by_uid(self.uid))
 
     def get_items(self, category=None):
-        items = self.api.get_items_by_category(self.uid, category)
+        items = self.api.get_iids_by_category(self.uid, category)
         for item in items:
-            print(self.api.get_item_info(item))
+            print(self.api.get_item_by_iid(item))
 
     def add_item(self, iid: int, count: int):
         try:
-            res = self.api.add_item_to_cart(self.uid, iid, count)
+            res = self.api.add_iid_to_cart(self.uid, iid, count)
             if not res:
-                print(f"Unable to add {count} items to cart! have {self.api.get_item_info(iid).count}")
+                print(f"Unable to add {count} items to cart! have {self.api.get_item_by_iid(iid).count}")
 
         except self.api.UserIdError:
             print("Invalid user ID!")
@@ -93,7 +93,7 @@ class CLI:
             return False
 
     def list_cart(self):
-        for item in self.api.get_cart_by_id(self.uid):
+        for item in self.api.get_cart_by_uid(self.uid):
             print(item)
 
     def get_address(self):
@@ -149,7 +149,7 @@ def main_function():
             if len(cmd) == 2:
                 cli.get_items(None)
             elif len(cmd) == 3:
-                cli.get_items(cmd[2])
+                cli.get_items(cmd[2:].)
             else:
                 print("Invalid number of arguments!")
         # Add items to cart
@@ -158,7 +158,6 @@ def main_function():
                 print("Add requires item id!")
                 continue
             elif 2 < len(cmd) < 5:
-                iid = None
                 try:
                     iid = int(cmd[2])
                 except ValueError:
@@ -222,9 +221,6 @@ def main_function():
             cli.change_address()
         else:
             print(f"Unknown command: {cmd}, type \"help\" for a list of commands")
-
-
-
 
 
 if __name__ == "__main__":
