@@ -1,3 +1,5 @@
+from database import Database
+db = Database()
 
 class Api:
     """ Attempts to log in to the client.
@@ -9,8 +11,9 @@ class Api:
     """
     def login(self, uname: str, pw: str) -> int:
         # Placeholder
-        if 2 == int("2"):
-            return 345
+        uid = db.auth_user(uname, pw)
+        if uid:
+          return uid
         else:
             raise self.LoginError
 
@@ -21,16 +24,13 @@ class Api:
     :raises CategoryIDError: Category does not exist
     :return A list of items
     """
-    def get_iids_by_category(self, uid: int, category) -> list:
-        if uid == 345:
-            if category is None:
-                return [5, 6, 7, 8]
-            elif category != "":
-                return [5, 6]
-            else:
-                raise self.CategoryError
+    def get_iids_by_category(self, category) -> list:
+        res = db.get_item_by_category(category)
+        if res:
+          print(res)
+          return res
         else:
-            raise self.UserIdError
+            raise self.CategoryError
 
     """ Gets items from the database by a specific category
     :param uid: User id
@@ -44,29 +44,38 @@ class Api:
     :return if successful
     """
     def add_iid_to_cart(self, uid: int, iid: int, count=1):
-        print(f"Adding {count} items of id {iid}")
-        if int(count) != count:
-            raise ValueError("Count must be an integer")
-        if uid == 345:
-            if iid not in [5, 6, 7, 8]:
-                raise self.ItemIdError
-            elif count < int(iid/2): # emulate stock
-                return True
-        else:
-            raise self.UserIdError
-        pass
+      db.add_item_to_cart(uid, iid, count)
+
+    """
+    """
+    def remove_iid_from_cart(self, uid: int, iid: int, count=1):
+      db.remove_item_from_cart(uid, iid, count)
 
     """ Gets items from user's cart by their id
     :param uid: User id
     
     """
     def get_cart_by_uid(self, uid: int):
-        return [(5, 2), (6,1)]
-
-    def remove_iid_from_cart(self, uid: int, iid: int, count=None):
+      cart = db.get_user_cart(uid)
+      if cart:
+        return cart
+      else:
+        return -1
+    
+    def print_cart(self, uid: int):
+      cart = db.get_user_cart(uid)
+      if cart:
+        contents = db.get_cart_contents(cart.id)
+        for cart_item in contents:
+          print("id: {}, count: {}, shopping_cart_id: {}, item_id: {}".\
+            format(cart_item.id, cart_item.count, cart_item.shopping_cart_id, cart_item.item_id))
+      else:
         pass
 
     def get_item_by_iid(self, iid: int):
+      return db.get_item_info(iid)
+
+    def remove_iid_from_cart(self, uid: int, iid: int, count=None):
         pass
 
     def edit_address(self, uid, name, line1, line2, city, state, zipcode):

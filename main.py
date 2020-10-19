@@ -75,7 +75,7 @@ class CLI:
         print(self.api.get_address_by_uid(self.uid))
 
     def get_items(self, category=None):
-        items = self.api.get_iids_by_category(self.uid, category)
+        items = self.api.get_iids_by_category(category)
         for item in items:
             print(self.api.get_item_by_iid(item))
 
@@ -83,7 +83,7 @@ class CLI:
         try:
             res = self.api.add_iid_to_cart(self.uid, iid, count)
             if not res:
-                print(f"Unable to add {count} items to cart! have {self.api.get_item_by_iid(iid).count}")
+                print(f"Unable to add {count} items to cart! have {self.api.get_item_by_iid(iid).stock}")
 
         except self.api.UserIdError:
             print("Invalid user ID!")
@@ -149,7 +149,7 @@ def main_function():
             if len(cmd) == 2:
                 cli.get_items(None)
             elif len(cmd) == 3:
-                cli.get_items(cmd[2:].)
+                cli.get_items(cmd[2:])
             else:
                 print("Invalid number of arguments!")
         # Add items to cart
