@@ -52,7 +52,7 @@ class Api:
 
     """
     """
-    def delete_item_from_cart(self, uid: int, iid: int, count=1):
+    def remove_item_from_cart(self, uid: int, iid: int, count=1):
       db.remove_item_from_cart(uid, iid, count)
 
     """ Gets items from user's cart by their id
@@ -75,9 +75,6 @@ class Api:
             format(cart_item.id, cart_item.count, cart_item.shopping_cart_id, cart_item.item_id))
       else:
         pass
-
-    def remove_item_from_cart(self, uid: int, param, param1):
-      pass
 
     def get_item_info(self, iid: int):
       db.get_item_info(iid)
@@ -103,7 +100,7 @@ api.add_item_to_cart(1, 1, 1)
 api.add_item_to_cart(1, 2, 3)
 api.get_cart_by_id(1)
 api.print_cart(1)
-api.delete_item_from_cart(1, 2)
+api.remove_item_from_cart(1, 2)
 api.get_cart_by_id(1)
 print("AFTER")
 api.print_cart(1)
