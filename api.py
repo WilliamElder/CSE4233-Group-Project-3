@@ -43,13 +43,14 @@ class Api:
     
     :return if successful
     """
-    def add_item_to_cart(self, uid: int, iid:int, count=1):
+    def add_item_to_cart(self, uid: int, iid: int, count=1):
+        print(f"Adding {count} items of id {iid}")
         if int(count) != count:
             raise ValueError("Count must be an integer")
         if uid == 345:
             if iid not in [5, 6, 7, 8]:
                 raise self.ItemIdError
-            elif count > int(iid/2): # emulate stock
+            elif count < int(iid/2): # emulate stock
                 return True
         else:
             raise self.UserIdError
@@ -60,12 +61,30 @@ class Api:
     
     """
     def get_cart_by_id(self, uid: int):
-        pass
+        return [(5, 2), (6,1)]
 
     def remove_item_from_cart(self, uid: int, iid: int, count=None):
         pass
 
+
     def get_item_info(self, iid: int):
+        pass
+
+    def edit_address(self, uid, name, line1, line2, city, state, zipcode):
+        pass
+
+    def get_address_by_uid(self, uid):
+        # Return None if none, otherwise return address
+        pass
+
+    def list_categories(self, uid):
+        return ["Wingus", "Bingus"]
+
+    def verify_card(self, ccd, cvc, exp):
+        # lol
+        return True
+
+    def checkout(self, ccd, cvc, exp):
         pass
 
     class UserIdError(Exception):
@@ -78,11 +97,4 @@ class Api:
         pass
 
     class LoginError(Exception):
-        pass
-
-    def edit_address(self, uid, name, line1, line2, city, state, zipcode):
-        pass
-
-    def get_address_by_uid(self, uid):
-        # Return None if none, otherwise return address
         pass
