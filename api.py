@@ -48,20 +48,20 @@ class Api:
     :return if successful
     """
     def add_item_to_cart(self, uid: int, iid:int, count=1):
-        return db.get_user_cart(1)
+        db.add_item_to_cart(uid, iid, count)
 
     """ Gets items from user's cart by their id
     :param uid: User id
     
     """
     def get_cart_by_id(self, uid: int):
-        pass
+        db.get_user_cart(uid)
 
     def remove_item_from_cart(self, uid: int, param, param1):
         pass
 
     def get_item_info(self, iid: int):
-        pass
+        db.get_item_info(iid)
 
     class UserIdError(Exception):
         pass
@@ -78,4 +78,7 @@ class Api:
 api = Api()
 
 api.login('justin', 'password1234')
-print(api.add_item_to_cart(1, 1, 1))
+api.get_cart_by_id(1)
+api.get_item_info(1)
+api.add_item_to_cart(1, 1, 2)
+api.add_item_to_cart(1, 2, 3)

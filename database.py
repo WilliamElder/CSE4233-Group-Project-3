@@ -56,7 +56,8 @@ class ShoppingCartItem(Base):
   date_added = Column(Date, nullable=False)
   shopping_cart_id = Column(Integer, ForeignKey("shopping_cart.id"))
   shopping_cart = relationship("ShoppingCart", back_populates="items")
-  item = relationship('StoreItem', secondary='shopping_cart_item_store_item_link')
+  item_id = Column(Integer, ForeignKey('store_item.id'))
+  item = relationship("StoreItem", back_populates="shopping_cart_items")
 
 class StoreItem(Base):
   __tablename__ = 'store_item'
@@ -67,7 +68,7 @@ class StoreItem(Base):
   description = Column(String)
   stock = Column(Integer, nullable=False)
   category = Column(String)
-  shopping_cart_item_id = relationship('ShoppingCartItem', secondary='shopping_cart_item_store_item_link')
+  shopping_cart_items = relationship("ShoppingCartItem", back_populates="item")
   order_id = relationship('Order', secondary='orders_store_item_link')
 
 class ShoppingCart(Base):
@@ -141,13 +142,23 @@ class Database:
     )
     justin_shopping_cart_id = self.connection.execute(ins).inserted_primary_key[0]
 
-    # sel = select([User])
-    # for row in self.connection.execute(sel):
-    #   print(row)
-    
-    # sel = select([ShoppingCart])
-    # for row in self.connection.execute(sel):
-    #   print(row)
+    # StoreItem data
+    ins = insert(StoreItem).values(
+      name = "Stale Chips",
+      price = 25.50,
+      description = "10 year old bag of chips that no one wants",
+      stock = 2,
+      category = "Food"
+    )
+
+    ins = insert(StoreItem).values(
+      name = "Harry Potter Book",
+      price = 15.99,
+      description = "Classic Harry Potter Book",
+      stock = 5,
+      category = "Book"
+    )
+    self.connection.execute(ins)
 
   """ Tries to auth user by username and password
   :param username:
@@ -155,19 +166,60 @@ class Database:
 
   :return User.id of user
   """
-  def auth_user(self, username: str, password: str):
+  def auth_user(self, username: str, password: str) -> int:
     if len(username) > 0 and len(password) > 0:
       statement = text("SELECT * FROM users WHERE users.username = '{}' AND users.password = '{}'".format(username, password))
-      result = self.connection.execute(statement)
-      return result.lastrowid
+      res = self.connection.execute(statement).fetchone()
+      if res:
+        return res.id
+      else:
+        return -1
     else:
       return -1
 
   def get_user_cart(self, uid: int) -> int:
     if uid > 0:
       statement = text("SELECT * FROM shopping_cart WHERE shopping_cart.user_id = '{}'".format(uid))
-      return self.connection.execute(statement).fetchone().id
+      res = self.connection.execute(statement).fetchone()
+      print(res)
+      if res:
+        return res.id
+      else:
+        return -1
     else:
       return -1
+
+  def get_item_info(self, id: int):
+    if id > 0:
+      statement = text("SELECT * FROM store_item WHERE store_item.id = '{}'".format(id))
+      res = self.connection.execute(statement).fetchone()
+      if res:
+        return res.id
+      else:
+        return -1
+    else:
+      return -1
+
+  def add_item_to_cart(self, uid: int, iid: int, count):
+    if uid > 0 and iid > 0 and count > 0:
+      statement = text("SELECT * FROM users WHERE users.id = '{}'".format(uid))
+      res = self.connection.execute(statement).fetchone()
+      if res:
+        statement = text("SELECT * FROM store_item WHERE store_item.id = '{}'".format(iid))
+        res = self.connection.execute(statement).fetchone()
+        if res:
+          cart_id = self.get_user_cart(uid)
+          ins = insert(ShoppingCartItem).values(
+            count = count,
+            date_added = date.today(),
+            shopping_cart_id = cart_id,
+            item_id = iid
+          )
+          self.connection.execute(ins)
+          sel = select([ShoppingCart.items])
+          print(res.keys)
+          for row in self.connection.execute(sel):
+            print(row)
+          return 1
 
     
