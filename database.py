@@ -11,6 +11,7 @@ class User(Base):
   id = Column(Integer, primary_key=True, nullable=False)
   username = Column(String, nullable=False)
   password = Column(String, nullable=False)
+  shipping_address = Column(Integer, ForeignKey("address.id"))
   shopping_cart = relationship("ShoppingCart", uselist=False, back_populates="user")
   orders = relationship("Order", back_populates="user", uselist=False)
 
@@ -21,6 +22,7 @@ class Order(Base):
   user_id = Column(Integer, ForeignKey("users.id"))
   user = relationship("User", back_populates="orders")
   payment = relationship("Payment", uselist=False, backref="orders")
+  shipping_address = Column(Integer, ForeignKey("address.id"))
   date = Column(Date, nullable=False)
   item_id = Column(Integer, ForeignKey('store_item.id'))
   item = relationship("StoreItem", back_populates="order_items")
@@ -78,6 +80,7 @@ class ShoppingCart(Base):
   id = Column(Integer, primary_key=True, nullable=False)
   date_created = Column(Date, nullable=False)
   user_id = Column(Integer, ForeignKey("users.id"))
+  items = Column(Integer, ForeignKey("shopping_cart_item.id"))
   user = relationship("User", back_populates="shopping_cart")
 
 class Database:
