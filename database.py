@@ -18,12 +18,12 @@ class Order(Base):
   __tablename__ = 'orders'
 
   id = Column(Integer, primary_key=True)
-  status = Column(String, nullable=False)
   user_id = Column(Integer, ForeignKey("users.id"))
   user = relationship("User", back_populates="orders")
   payment = relationship("Payment", uselist=False, backref="orders")
   date = Column(Date, nullable=False)
-  store_items = relationship('StoreItem', secondary='orders_store_item_link')
+  item_id = Column(Integer, ForeignKey('store_item.id'))
+  item = relationship("StoreItem", back_populates="order_items")
 
 class Address(Base):
   __tablename__ = 'address'
@@ -69,6 +69,7 @@ class StoreItem(Base):
   stock = Column(Integer, nullable=False)
   category = Column(String)
   shopping_cart_items = relationship("ShoppingCartItem", back_populates="item")
+  order_items = relationship("Order", back_populates="item")
   order_id = relationship('Order', secondary='orders_store_item_link')
 
 class ShoppingCart(Base):
@@ -76,23 +77,8 @@ class ShoppingCart(Base):
 
   id = Column(Integer, primary_key=True, nullable=False)
   date_created = Column(Date, nullable=False)
-  # items = relationship("ShoppingCartItem", uselist=False, back_populates="shopping_cart")
   user_id = Column(Integer, ForeignKey("users.id"))
   user = relationship("User", back_populates="shopping_cart")
-
-# Association tables (many to many) tables below
-class ShoppingCartItemStoreItemLink(Base):
-  __tablename__ = 'shopping_cart_item_store_item_link'
-
-  shopping_cart_item_id = Column(Integer, ForeignKey('shopping_cart_item.id'), primary_key=True)
-  store_item_id = Column(Integer, ForeignKey("store_item.id"), primary_key=True)
-
-class OrderStoreItemLink(Base):
-  __tablename__ = 'orders_store_item_link'
-
-  order_id = Column(Integer, ForeignKey('orders.id'), primary_key=True)
-  store_item_id = Column(Integer, ForeignKey("store_item.id"), primary_key=True)
-
 
 class Database:
   engine = create_engine('sqlite:///:memory:')
@@ -251,3 +237,23 @@ class Database:
             return 1
           else:
             return -1
+
+  def complete_order(self, uid: int):
+    if uid > 0:
+      statement = text("SELECT * FROM users WHERE users.id = '{}'".format(uid))
+      res = self.connection.execute(statement).fetchone()
+      if res:
+        cart_id = self.get_user_cart(uid).id
+        cart_contents = self.get_cart_contents(cart_id)
+        for row in cart_contents:
+          statement = text("INSERT INTO orders (user_id, item_id, date) VALUES ('{}', '{}', '{}')".format(uid, row.item_id, date.today()))
+          if not self.connection.execute(statement):
+            return -1
+
+  def print_orders(self, uid: int):
+    if uid > 0:
+      sel = select([Order])
+      res = self.connection.execute(sel)
+      if res:
+        for row in res:
+          print("id: {}, user_id: {}, item_id: {}".format(row.id, row.user_id, row.item_id))

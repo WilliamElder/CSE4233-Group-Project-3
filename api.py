@@ -79,6 +79,8 @@ class Api:
     def get_item_info(self, iid: int):
       db.get_item_info(iid)
 
+    # def complete_purchase(self, shopping_cart_id: int)
+
     class UserIdError(Exception):
         pass
 
@@ -103,4 +105,7 @@ api.print_cart(1)
 api.remove_item_from_cart(1, 2)
 api.get_cart_by_id(1)
 print("AFTER")
+db.complete_order(1)
 api.print_cart(1)
+print("\n\n")
+db.print_orders(1)
