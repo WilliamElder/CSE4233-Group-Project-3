@@ -55,7 +55,7 @@ class ShoppingCartItem(Base):
   count = Column(Integer, nullable=False)
   date_added = Column(Date, nullable=False)
   shopping_cart_id = Column(Integer, ForeignKey("shopping_cart.id"))
-  shopping_cart = relationship("ShoppingCart", back_populates="items")
+  shopping_cart = relationship("ShoppingCart")
   item_id = Column(Integer, ForeignKey('store_item.id'))
   item = relationship("StoreItem", back_populates="shopping_cart_items")
 
@@ -76,7 +76,7 @@ class ShoppingCart(Base):
 
   id = Column(Integer, primary_key=True, nullable=False)
   date_created = Column(Date, nullable=False)
-  items = relationship("ShoppingCartItem", uselist=False, back_populates="shopping_cart")
+  # items = relationship("ShoppingCartItem", uselist=False, back_populates="shopping_cart")
   user_id = Column(Integer, ForeignKey("users.id"))
   user = relationship("User", back_populates="shopping_cart")
 
@@ -150,6 +150,7 @@ class Database:
       stock = 2,
       category = "Food"
     )
+    self.connection.execute(ins)
 
     ins = insert(StoreItem).values(
       name = "Harry Potter Book",
@@ -181,13 +182,21 @@ class Database:
     if uid > 0:
       statement = text("SELECT * FROM shopping_cart WHERE shopping_cart.user_id = '{}'".format(uid))
       res = self.connection.execute(statement).fetchone()
-      print(res)
       if res:
-        return res.id
+        return res
       else:
         return -1
     else:
       return -1
+
+  def get_cart_contents(self, cart_id: int):
+    if cart_id > 0:
+      statement = text("SELECT * FROM shopping_cart_item WHERE shopping_cart_item.shopping_cart_id = '{}'".format(cart_id))
+      res = self.connection.execute(statement)
+      if res:
+        return res
+      else:
+        return -1
 
   def get_item_info(self, id: int):
     if id > 0:
@@ -208,7 +217,7 @@ class Database:
         statement = text("SELECT * FROM store_item WHERE store_item.id = '{}'".format(iid))
         res = self.connection.execute(statement).fetchone()
         if res:
-          cart_id = self.get_user_cart(uid)
+          cart_id = self.get_user_cart(uid).id
           ins = insert(ShoppingCartItem).values(
             count = count,
             date_added = date.today(),
@@ -216,10 +225,5 @@ class Database:
             item_id = iid
           )
           self.connection.execute(ins)
-          sel = select([ShoppingCart.items])
-          print(res.keys)
-          for row in self.connection.execute(sel):
-            print(row)
           return 1
-
     
