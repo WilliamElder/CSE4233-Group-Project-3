@@ -25,7 +25,7 @@ class Api:
         if uid == 345:
             if category is None:
                 return [5, 6, 7, 8]
-            elif category is not "":
+            elif category != "":
                 return [5, 6]
             else:
                 raise self.CategoryError
@@ -50,8 +50,7 @@ class Api:
             if iid not in [5, 6, 7, 8]:
                 raise self.ItemIdError
             elif count > int(iid/2): # emulate stock
-
-
+                return True
         else:
             raise self.UserIdError
         pass
@@ -63,7 +62,7 @@ class Api:
     def get_cart_by_id(self, uid: int):
         pass
 
-    def remove_item_from_cart(self, uid: int, param, param1):
+    def remove_item_from_cart(self, uid: int, iid: int, count=None):
         pass
 
     def get_item_info(self, iid: int):
@@ -79,4 +78,11 @@ class Api:
         pass
 
     class LoginError(Exception):
+        pass
+
+    def edit_address(self, uid, name, line1, line2, city, state, zipcode):
+        pass
+
+    def get_address_by_uid(self, uid):
+        # Return None if none, otherwise return address
         pass
