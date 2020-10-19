@@ -198,6 +198,15 @@ class Database:
     else:
       return -1
 
+  def get_item_by_category(self, category):
+    statement = text("SELECT * FROM store_item WHERE store_item.category = '{}'".format(category[0]))
+    res = self.connection.execute(statement).fetchone()
+    if res:
+      print(res)
+      return res
+    else:
+      return -1
+
   def add_item_to_cart(self, uid: int, iid: int, count):
     if uid > 0 and iid > 0 and count > 0:
       statement = text("SELECT * FROM users WHERE users.id = '{}'".format(uid))

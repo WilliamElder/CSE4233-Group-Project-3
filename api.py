@@ -24,17 +24,13 @@ class Api:
     :raises CategoryIDError: Category does not exist
     :return A list of items
     """
-    def get_items_by_category(self, uid: int, category) -> list:
-      pass
-        # if uid == 345:
-        #     if category is None:
-        #         return [5, 6, 7, 8]
-        #     elif category is not "":
-        #         return [5, 6]
-        #     else:
-        #         raise self.CategoryError
-        # else:
-        #     raise self.UserIdError
+    def get_iids_by_category(self, category) -> list:
+        res = db.get_item_by_category(category)
+        if res:
+          print(res)
+          return res
+        else:
+            raise self.CategoryError
 
     """ Gets items from the database by a specific category
     :param uid: User id
@@ -47,24 +43,24 @@ class Api:
     
     :return if successful
     """
-    def add_item_to_cart(self, uid: int, iid: int, count=1):
+    def add_iid_to_cart(self, uid: int, iid: int, count=1):
       db.add_item_to_cart(uid, iid, count)
 
     """
     """
-    def remove_item_from_cart(self, uid: int, iid: int, count=1):
+    def remove_iid_from_cart(self, uid: int, iid: int, count=1):
       db.remove_item_from_cart(uid, iid, count)
 
     """ Gets items from user's cart by their id
     :param uid: User id
     
     """
-    def get_cart_by_id(self, uid: int):
+    def get_cart_by_uid(self, uid: int):
       cart = db.get_user_cart(uid)
       if cart:
-        id = cart.id
+        return cart
       else:
-        pass
+        return -1
     
     def print_cart(self, uid: int):
       cart = db.get_user_cart(uid)
@@ -76,10 +72,28 @@ class Api:
       else:
         pass
 
-    def get_item_info(self, iid: int):
-      db.get_item_info(iid)
+    def get_item_by_iid(self, iid: int):
+      return db.get_item_info(iid)
 
-    # def complete_purchase(self, shopping_cart_id: int)
+    def remove_iid_from_cart(self, uid: int, iid: int, count=None):
+        pass
+
+    def edit_address(self, uid, name, line1, line2, city, state, zipcode):
+        pass
+
+    def get_address_by_uid(self, uid):
+        # Return None if none, otherwise return address
+        pass
+
+    def list_categories(self, uid):
+        return ["Wingus", "Bingus"]
+
+    def verify_card(self, ccd, cvc, exp):
+        # lol
+        return True
+
+    def checkout(self, ccd, cvc, exp):
+        pass
 
     class UserIdError(Exception):
         pass
@@ -92,20 +106,3 @@ class Api:
 
     class LoginError(Exception):
         pass
-
-api = Api()
-
-api.login('justin', 'password1234')
-api.get_cart_by_id(1)
-api.get_item_info(1)
-api.add_item_to_cart(1, 1, 1)
-api.add_item_to_cart(1, 2, 3)
-api.get_cart_by_id(1)
-api.print_cart(1)
-api.remove_item_from_cart(1, 2)
-api.get_cart_by_id(1)
-print("AFTER")
-db.complete_order(1)
-api.print_cart(1)
-print("\n\n")
-db.print_orders(1)
